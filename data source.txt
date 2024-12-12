@@ -1,0 +1,11 @@
+(1) EVI: derived from the National Aeronautics and Space Administration (NASA) MODIS EVI product (MOD13A1, Collection 6) 
+(2) SIF: obtained from global monthly GOSIF (https://globalecology. unh.edu/data/GOSIF.html)
+(3) Climate Data (TMAX, TMIN, TMP, PRE): obtained from the National Science and Technology Foundation Platform-National Earth System Science Data Center (http://www.geodata.cn)
+(4) Soil moisture: obtained from the Global Land Data Assimilation System (GLDAS) soil moisture content (GLDAS_NOAH025_Mv2.1) supplied by NASA (https://giovanni.gsfc.nasa.gov/ giovanni/)
+(5) Winter Wheat Distribution Data: provided by EARTHSTAT (Harvested Area and Yield for 175 Crops year 2000, http://www.earthstat.org/harvested-area-yield-175-crops/)
+(6) SPEI: SPEIbase v.3.0, http://digital.csic.es/handle/10261/153475
+
+
+
+
+

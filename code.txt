@@ -1,0 +1,57 @@
+WH <- read.csv('H:\\DLW\\RF\\data.csv',header=T,fileEncoding = "UTF-8-BOM")
+
+CVgroup <- function(k,datasize,seed){
+  cvlist <- list()
+  set.seed(seed)
+  n <- rep(1:k,ceiling(datasize/k))[1:datasize]    
+  temp <- sample(n,datasize)   
+  x <- 1:k
+  dataseq <- 1:datasize
+  cvlist <- lapply(x,function(x) dataseq[temp==x])  
+  return(cvlist)
+}
+k <- 10
+datasize <- nrow(WH)
+cvlist <- CVgroup(k = k,datasize = datasize,seed = 2000)
+cvlist
+
+pred <- data.frame() 
+for (i in 1:k) {
+    train <- WH[-cvlist[[i]],]                     
+    test <- WH[cvlist[[i]],]
+    
+    model <- randomForest(YIELD~ ., data = train,mtry=20, ntree =500 ,na.action=na.exclude)   
+    prediction <- predict(model, subset(test, select = - YIELD))
+    kcross <- rep(i, length(prediction))             
+    temp <- data.frame(cbind(subset(test, select = YIELD), prediction, kcross))
+    pred <- rbind(pred, temp) #temp?????????pred??????
+    
+  }
+write.table(pred, "E:\\1\\10-3\\predict.csv", sep=',',row.names = FALSE)
+r2fun <- function(pred, obs) cor(pred, obs)^2
+maefun <- function(pred, obs) mean(abs(pred - obs))
+rmsefun <- function(pred, obs) sqrt(mean((pred - obs)^2))
+library(dplyr)
+eval <- pred %>% group_by( kcross) %>%   
+  summarise(mae = maefun(prediction, YIELD),
+            r2 = r2fun(prediction, YIELD),
+            rmse = rmsefun(prediction, YIELD))
+write.table(eval, "H:\\DLW\\RF\\data_evaluation.csv", sep=',',row.names = FALSE)
+
+#importance
+rf_train<-randomForest(YIELD~ ., data = WH,mtry=20, ntree =500 ,importance=TRUE,proximity=TRUE)
+importance <- data.frame(importance(rf_train,scale=TRUE), check.names = FALSE)
+varImpPlot(model, n.var = min(50, nrow(model$importance)),
+           main = 'Top50 - variable importance')
+write.table(importance , "H:\\DLW\\RF\\data_importance.csv", sep=',',row.names = FALSE)
+
+
+WH1 <- read.csv('H:\\DLW\\RF\\data2011.csv',header=T,fileEncoding = "UTF-8-BOM")
+library(randomForest)
+set.seed(2000)
+pred1<-predict(model,newdata = WH1)
+write.table(pred1, "H:\\DLW\\RF\\data2011_predictrf.csv", sep=',',row.names = FALSE)
+R2<-cor(WH1$YIELD,pred1)^2
+RMSE<-(sum(abs(WH1$YIELD-pred1)^2)/length(WH1$YIELD))^0.5
+MAE<-sum(abs(WH1$YIELD-pred1))/length(WH1$YIELD)
+
